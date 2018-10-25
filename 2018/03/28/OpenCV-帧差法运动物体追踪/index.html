@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>OpenCV 帧差法运动物体追踪 | Hexo</title>
+  <meta name="description" content="最近迷上了物体跟踪的玩意,于是乎找了好多视频去看，翻来覆去呢就是用到了轮廓检测的api，还有耐心的不断的调试。 原理呢是帧差法（就是一帧一帧的比较）非HSV分离 看看视频 软件的工作流程 您的浏览器不支持 video 标签。 代码呢，emmm，真的是不好理解。 123456789101112131415161718192021222324252627282930313233343536373839">
+<meta name="keywords" content="opencv">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCV 帧差法运动物体追踪">
+<meta property="og:url" content="https://LTitan.github.io/2018/03/28/OpenCV-帧差法运动物体追踪/index.html">
+<meta property="og:site_name" content="LTitan`s Blog">
+<meta property="og:description" content="最近迷上了物体跟踪的玩意,于是乎找了好多视频去看，翻来覆去呢就是用到了轮廓检测的api，还有耐心的不断的调试。 原理呢是帧差法（就是一帧一帧的比较）非HSV分离 看看视频 软件的工作流程 您的浏览器不支持 video 标签。 代码呢，emmm，真的是不好理解。 123456789101112131415161718192021222324252627282930313233343536373839">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-10-24T12:32:55.870Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OpenCV 帧差法运动物体追踪">
+<meta name="twitter:description" content="最近迷上了物体跟踪的玩意,于是乎找了好多视频去看，翻来覆去呢就是用到了轮廓检测的api，还有耐心的不断的调试。 原理呢是帧差法（就是一帧一帧的比较）非HSV分离 看看视频 软件的工作流程 您的浏览器不支持 video 标签。 代码呢，emmm，真的是不好理解。 123456789101112131415161718192021222324252627282930313233343536373839">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://LTitan.github.io/2018/03/28/OpenCV-帧差法运动物体追踪/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="LTitan`s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+  
+</head>
+
+
+<body class="main-center theme-blue" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/ltitan" target="_blank">
+          <img class="img-circle img-rotate" src="/images/lyf.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">LTitan</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">C++/Python &amp; Algorithm</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Jilin, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索">
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech="">
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope="" itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope="" itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/">OS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data-structure</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opencv/">opencv</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/others/">others</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-OpenCV-帧差法运动物体追踪" class="article article-type-post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      OpenCV 帧差法运动物体追踪
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2018/03/28/OpenCV-帧差法运动物体追踪/" class="article-date">
+	  <time datetime="2018-03-28T06:30:20.000Z" itemprop="datePublished">2018-03-28</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/opencv/">opencv</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2018/03/28/OpenCV-帧差法运动物体追踪/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 898(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 4(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>最近迷上了物体跟踪的玩意,于是乎找了好多视频去看，翻来覆去呢就是用到了轮廓检测的api，还有耐心的不断的调试。</p>
+<p>原理呢是帧差法（就是一帧一帧的比较）非HSV分离<br>
+看看视频 软件的工作流程</p>
+<p><video src="/images/2018/03/233.mp4" controls="controls" width="820"><br>您的浏览器不支持 video 标签。<br></video></p>
+<p>代码呢，emmm，真的是不好理解。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;opencv2/highgui/highgui.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;opencv/cv.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;opencv/highgui.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> cv;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">static</span> <span class="keyword">int</span> SEAITVITV_VALUE = <span class="number">20</span>; <span class="comment">//阈值操作的起始范围 可手动调试</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">static</span> <span class="keyword">int</span> BLUR_SIZE = <span class="number">10</span>;<span class="comment">//blur 滤波Size大小</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> theObject[<span class="number">2</span>] = &#123; <span class="number">0</span>,<span class="number">0</span> &#125;;<span class="comment">//发现目标的坐标 x,y</span></span><br><span class="line"></span><br><span class="line">Rect objectBoundingRect = Rect(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);<span class="comment">//目标跳动的矩形</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="built_in">string</span> <span class="title">intTostring</span><span class="params">(<span class="keyword">int</span> num)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="comment">//int 类型 转为 string</span></span><br><span class="line"><span class="built_in">stringstream</span> ss;</span><br><span class="line">ss &lt;&lt; num;</span><br><span class="line"><span class="keyword">return</span> ss.str();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">searchForMovement</span><span class="params">(Mat thresgoldImage, Mat &amp;cameraFeed)</span></span></span><br><span class="line"><span class="function"></span>&#123;    <span class="comment">//寻找移动物</span></span><br><span class="line"></span><br><span class="line">Mat temp;</span><br><span class="line"><span class="keyword">bool</span> objectDetected;</span><br><span class="line"><span class="comment">//形参的阈值图像传给中间变量</span></span><br><span class="line">thresgoldImage.copyTo(temp);</span><br><span class="line"><span class="comment">//向量 用来存放轮廓点坐标 Point</span></span><br><span class="line"><span class="built_in">vector</span> &lt; <span class="built_in">vector</span>&lt;Point&gt; &gt; contours;</span><br><span class="line"><span class="comment">//向量 用来存放层次</span></span><br><span class="line"><span class="built_in">vector</span>&lt;Vec4i&gt; hierarchy;</span><br><span class="line"><span class="comment">//调用api 来获取层次和轮廓点</span></span><br><span class="line">findContours(temp, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);</span><br><span class="line"><span class="comment">//判断轮廓点的个数是否为0</span></span><br><span class="line"><span class="keyword">if</span> (contours.size() &gt; <span class="number">0</span>) objectDetected = <span class="literal">true</span>;</span><br><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">    objectDetected = <span class="literal">false</span>; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (objectDetected)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//找最大的轮廓点</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;Point&gt; &gt; largesContours;</span><br><span class="line">    largesContours.push_back(contours.at(contours.size() - <span class="number">1</span>));</span><br><span class="line">    objectBoundingRect = boundingRect(largesContours.at(<span class="number">0</span>));</span><br><span class="line">    <span class="comment">//约找出接近中心位置的点</span></span><br><span class="line">    <span class="keyword">int</span> xpos = objectBoundingRect.x + objectBoundingRect.width / <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">int</span> ypos = objectBoundingRect.y + objectBoundingRect.width / <span class="number">2</span>;</span><br><span class="line">    <span class="comment">//传给全局变量暂放坐标</span></span><br><span class="line">    theObject[<span class="number">0</span>] = xpos; theObject[<span class="number">1</span>] = ypos;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> x = theObject[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">int</span> y = theObject[<span class="number">1</span>];</span><br><span class="line"><span class="comment">//画一个圆圈</span></span><br><span class="line">circle(cameraFeed, Point(x, y), <span class="number">20</span>, Scalar(<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>);</span><br><span class="line"><span class="comment">//画十字架</span></span><br><span class="line">line(cameraFeed, Point(x, y), Point(x, y - <span class="number">25</span>),Scalar(<span class="number">0</span>,<span class="number">255</span>,<span class="number">0</span>),<span class="number">2</span>);</span><br><span class="line">line(cameraFeed, Point(x, y), Point(x, y + <span class="number">25</span>), Scalar(<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>);</span><br><span class="line">line(cameraFeed, Point(x, y), Point(x<span class="number">-25</span>, y ), Scalar(<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>);</span><br><span class="line">line(cameraFeed, Point(x, y), Point(x+<span class="number">25</span>, y ), Scalar(<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>);</span><br><span class="line"><span class="comment">//输出坐标</span></span><br><span class="line">putText(cameraFeed, <span class="string">"tracking at:("</span> + intTostring(x) + <span class="string">","</span> + intTostring(y) + <span class="string">")"</span>, Point(x, y), <span class="number">1</span>, <span class="number">1</span>, Scalar(<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span>  <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="comment">//按键是否调试</span></span><br><span class="line"><span class="keyword">bool</span> debugMode = <span class="literal">false</span>;</span><br><span class="line"><span class="comment">//按键是否跟踪</span></span><br><span class="line"><span class="keyword">bool</span> trackingEnable = <span class="literal">false</span>;</span><br><span class="line"><span class="comment">//是否暂停视频</span></span><br><span class="line"><span class="keyword">bool</span> pause = <span class="literal">false</span>;</span><br><span class="line"><span class="comment">//视频取帧的frame1 frame2</span></span><br><span class="line">Mat frame1, frame2;</span><br><span class="line"><span class="comment">//上者灰度图像</span></span><br><span class="line">Mat gray1, gray2;</span><br><span class="line"><span class="comment">//两者的不同图像</span></span><br><span class="line">Mat differenceImg;</span><br><span class="line"><span class="comment">//视频类</span></span><br><span class="line">VideoCapture capture;</span><br><span class="line"><span class="comment">//阈值后的图像</span></span><br><span class="line">Mat thres;</span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>)<span class="comment">//不断的播放视频 进行调试</span></span><br><span class="line">&#123;</span><br><span class="line">    capture.open(<span class="string">"3.mp4"</span>);</span><br><span class="line">    <span class="keyword">if</span> (!capture.isOpened())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//打开视频失败</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">-2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//int total = capture.get(CV_CAP_PROP_FRAME_COUNT);</span></span><br><span class="line">    <span class="comment">//cout &lt;&lt; total &lt;&lt; endl;</span></span><br><span class="line">    <span class="comment">//获取当前帧 与总帧进行比较 从而循环</span></span><br><span class="line">    <span class="keyword">while</span> (capture.get(CV_CAP_PROP_POS_FRAMES) &lt; capture.get(CV_CAP_PROP_FRAME_COUNT) - <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//捕获frame1</span></span><br><span class="line">        capture.read(frame1);</span><br><span class="line">        <span class="comment">//转为灰度图</span></span><br><span class="line">        cvtColor(frame1, gray1, COLOR_BGR2GRAY);</span><br><span class="line">        <span class="comment">//捕获frame2</span></span><br><span class="line">        capture.read(frame2);</span><br><span class="line">        <span class="comment">//转为灰度图</span></span><br><span class="line">        cvtColor(frame2, gray2, COLOR_BGR2GRAY);</span><br><span class="line">        <span class="comment">//调用api 找出两者不同的区域 存入differenceImg</span></span><br><span class="line">        absdiff(gray1, gray2, differenceImg);</span><br><span class="line">        <span class="comment">//阈值操作</span></span><br><span class="line">        threshold(differenceImg, thres, SEAITVITV_VALUE, <span class="number">255</span>, THRESH_BINARY);</span><br><span class="line">        <span class="comment">//滤波 去噪点</span></span><br><span class="line">        blur(thres, thres, Size(BLUR_SIZE, BLUR_SIZE));</span><br><span class="line">        <span class="comment">//再进行一遍阈值</span></span><br><span class="line">        threshold(thres, thres, SEAITVITV_VALUE, <span class="number">255</span>, THRESH_BINARY);</span><br><span class="line">        <span class="comment">//是否进入调试模式</span></span><br><span class="line">            <span class="keyword">if</span> (debugMode == <span class="literal">true</span>) &#123;</span><br><span class="line">            imshow(<span class="string">"thres"</span>, thres);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">//销毁窗口</span></span><br><span class="line">                destroyWindow(<span class="string">"thres"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//是否进入追踪捕获模式</span></span><br><span class="line">            <span class="keyword">if</span> (trackingEnable) &#123;</span><br><span class="line">                searchForMovement( thres, frame1);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//显示原图像</span></span><br><span class="line">            imshow(<span class="string">"frame"</span>, frame1);</span><br><span class="line">        <span class="keyword">switch</span> (waitKey(<span class="number">50</span>))</span><br><span class="line">        &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">27</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">'t'</span>:</span><br><span class="line">        <span class="keyword">case</span> <span class="string">'T'</span>:</span><br><span class="line">        &#123;</span><br><span class="line">            trackingEnable = !trackingEnable;</span><br><span class="line">        <span class="keyword">if</span> (trackingEnable == <span class="literal">false</span>) <span class="built_in">cout</span> &lt;&lt; <span class="string">"没有捕获"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="built_in">cout</span> &lt;&lt; <span class="string">"捕获开始"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">break</span>; </span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">'d'</span>:</span><br><span class="line">        <span class="keyword">case</span> <span class="string">'D'</span>:</span><br><span class="line">        &#123;</span><br><span class="line">            debugMode = !debugMode;</span><br><span class="line">        <span class="keyword">if</span> (debugMode == <span class="literal">false</span>) <span class="built_in">cout</span> &lt;&lt; <span class="string">"调试模式退出\n"</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="built_in">cout</span> &lt;&lt; <span class="string">"进入调试模式"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">break</span>; </span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">112</span>:</span><br><span class="line">            pause = !pause;</span><br><span class="line">            <span class="keyword">if</span> (pause == <span class="literal">true</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">cout</span> &lt;&lt; <span class="string">"暂停"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">                <span class="keyword">while</span> (pause == <span class="literal">true</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">switch</span> (waitKey())</span><br><span class="line">                    &#123;</span><br><span class="line">                    <span class="keyword">case</span> <span class="number">112</span>:</span><br><span class="line">                        pause = <span class="literal">false</span>;</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="built_in">cout</span> &lt;&lt; <span class="string">"开始"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//播放完后释放类</span></span><br><span class="line">    capture.release();</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://LTitan.github.io/2018/03/28/OpenCV-帧差法运动物体追踪/" title="OpenCV 帧差法运动物体追踪" target="_blank" rel="external">https://LTitan.github.io/2018/03/28/OpenCV-帧差法运动物体追踪/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/ltitan" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/lyf.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/ltitan" target="_blank"><span class="text-dark">LTitan</span><small class="ml-1x">C++/Python &amp; Algorithm</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom="">
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2018/04/18/VS-自带数据库-MSSQLLocalDB-的使用方法/" title="VS 自带数据库 MSSQLLocalDB 的使用方法"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2018/02/26/新年?-当然是烟花了！！！/" title="新年？ 当然是烟花了！！！"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope="" itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

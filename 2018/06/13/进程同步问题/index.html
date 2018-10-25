@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>进程同步问题 | Hexo</title>
+  <meta name="description" content="#读写者问题(多个) 123456789101112131415161718192021222324252627282930313233343536373839404142int wmutex=1,rmutex=1;//读写信号量   int readCount=0;//读者数量   void Writer();   void Reader();   int main()   &amp;#123;">
+<meta name="keywords" content="OS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进程同步问题">
+<meta property="og:url" content="https://LTitan.github.io/2018/06/13/进程同步问题/index.html">
+<meta property="og:site_name" content="LTitan`s Blog">
+<meta property="og:description" content="#读写者问题(多个) 123456789101112131415161718192021222324252627282930313233343536373839404142int wmutex=1,rmutex=1;//读写信号量   int readCount=0;//读者数量   void Writer();   void Reader();   int main()   &amp;#123;">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-09-25T09:51:17.471Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="进程同步问题">
+<meta name="twitter:description" content="#读写者问题(多个) 123456789101112131415161718192021222324252627282930313233343536373839404142int wmutex=1,rmutex=1;//读写信号量   int readCount=0;//读者数量   void Writer();   void Reader();   int main()   &amp;#123;">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://LTitan.github.io/2018/06/13/进程同步问题/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="LTitan`s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+  
+</head>
+
+
+<body class="main-center theme-blue" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/ltitan" target="_blank">
+          <img class="img-circle img-rotate" src="/images/lyf.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">LTitan</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">C++/Python &amp; Algorithm</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Jilin, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索">
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech="">
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope="" itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope="" itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/">OS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data-structure</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opencv/">opencv</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/others/">others</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-进程同步问题" class="article article-type-post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      进程同步问题
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2018/06/13/进程同步问题/" class="article-date">
+	  <time datetime="2018-06-13T02:16:59.000Z" itemprop="datePublished">2018-06-13</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/OS/">OS</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2018/06/13/进程同步问题/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 808(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 4(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>#读写者问题(多个)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">int wmutex=1,rmutex=1;//读写信号量</span><br><span class="line">   int readCount=0;//读者数量</span><br><span class="line">   void Writer();</span><br><span class="line">   void Reader();</span><br><span class="line">   int main()</span><br><span class="line">   &#123;</span><br><span class="line">   	cobegin</span><br><span class="line">       	Reader();</span><br><span class="line">           Writer();</span><br><span class="line">       coend;</span><br><span class="line">   &#125;</span><br><span class="line">   //写者：</span><br><span class="line">   void Writer()</span><br><span class="line">   &#123;</span><br><span class="line">   	while(1)&#123;</span><br><span class="line">   	P(wmutex);</span><br><span class="line">       ...</span><br><span class="line">       写书</span><br><span class="line">       ...</span><br><span class="line">       V(wmutex);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   //读者</span><br><span class="line">   void Reader()</span><br><span class="line">   &#123;</span><br><span class="line">  	while(1)</span><br><span class="line">       &#123;</span><br><span class="line">   	P(rmutex);</span><br><span class="line">       if(readCount==0)</span><br><span class="line">       	P(wmutex);</span><br><span class="line">       readCount++;</span><br><span class="line">       V(rmutex);</span><br><span class="line">       ...</span><br><span class="line">       读书</span><br><span class="line">       ...</span><br><span class="line">       P(rmutex);</span><br><span class="line">       readCount--;</span><br><span class="line">       if(readCount==0)</span><br><span class="line">       	V(wmutex);</span><br><span class="line">       V(rmutex);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>#哲学家就餐问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">int chopstick[]=&#123;1,1,1,1,1&#125;;//五个筷子</span><br><span class="line">   int mutex=1;</span><br><span class="line">   int main()</span><br><span class="line">   &#123;</span><br><span class="line">   	cobegin</span><br><span class="line">       	switch(i)</span><br><span class="line">           &#123;</span><br><span class="line">       V(SB);</span><br><span class="line">           case 1~5: Pi();break;</span><br><span class="line">           &#125;</span><br><span class="line">       coend;</span><br><span class="line">   &#125;</span><br><span class="line">   Pi()//第i个哲学家进餐</span><br><span class="line">   &#123;</span><br><span class="line">   	while(1)</span><br><span class="line">       &#123;</span><br><span class="line">       	P(mutex);              //在取筷子前获得互斥量</span><br><span class="line">   		P(chopstick[i]);       //取左边筷子</span><br><span class="line">   		P(chopstick[(i+1)%5]); //取右边筷子</span><br><span class="line">   		V(mutex);              //释放取筷子的信号量</span><br><span class="line">           ...</span><br><span class="line">  			eat;                   //进餐</span><br><span class="line">           ...</span><br><span class="line">   		V(chopstick[i]);       //放回左边筷子</span><br><span class="line">   		V(chopstick[(i+1)%5]); //放回右边筷子</span><br><span class="line">           ...</span><br><span class="line">   		think;//思考</span><br><span class="line">           ...</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>#生产者消费者问题</p>
+<p>== 一个生产者 一个消费者 一个缓冲器：==</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">int buffer;//1 表示生产 0表示消费</span><br><span class="line">   int empty=1,full=0;//空和满</span><br><span class="line">   void producer();</span><br><span class="line">   void consumer();</span><br><span class="line">   int main()</span><br><span class="line">   &#123;</span><br><span class="line">   	cobegin</span><br><span class="line">       producer();   consumer();</span><br><span class="line">       coend;</span><br><span class="line">   &#125;</span><br><span class="line">    void producer()</span><br><span class="line">    &#123;</span><br><span class="line">    	while(1)</span><br><span class="line">       &#123;</span><br><span class="line">       	...</span><br><span class="line">           生产</span><br><span class="line">           ...</span><br><span class="line">       	P(empty);</span><br><span class="line">           buffer=1;</span><br><span class="line">           V(full);</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    void consumer()</span><br><span class="line">    &#123;</span><br><span class="line">    	while(1)</span><br><span class="line">       &#123;</span><br><span class="line">       	P(full);</span><br><span class="line">           buffer=0;</span><br><span class="line">           V(empty);</span><br><span class="line">           ...</span><br><span class="line">           消费</span><br><span class="line">           ...</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><mark>一个生产者 一个消费者 n个缓冲器：</mark></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">int buffer[1024],t=0,k=0;</span><br><span class="line">   int empty=1,full=0;</span><br><span class="line">   void producer();</span><br><span class="line">   void consumer();</span><br><span class="line">   int main()</span><br><span class="line">   &#123;</span><br><span class="line">   	cobegin</span><br><span class="line">       producer();   consumer();</span><br><span class="line">       coend;</span><br><span class="line">   &#125;</span><br><span class="line">    void producer()</span><br><span class="line">    &#123;</span><br><span class="line">    	while(1)</span><br><span class="line">       &#123;</span><br><span class="line">       	...</span><br><span class="line">           生产</span><br><span class="line">           ...</span><br><span class="line">           P(empty);</span><br><span class="line">           buffer[k]=1;</span><br><span class="line">           k=(++k)%n;</span><br><span class="line">           V(full);</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    void consumer()</span><br><span class="line">    &#123;</span><br><span class="line">    	while(1)</span><br><span class="line">       &#123;</span><br><span class="line">       	P(full);</span><br><span class="line">           buffer[t]=0;</span><br><span class="line">           t=(++t)%n;</span><br><span class="line">           V(empty);</span><br><span class="line">           ...</span><br><span class="line">           消费</span><br><span class="line">           ...</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>#司机与售票员问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">int s1=0,s2=0;</span><br><span class="line">   void P1();//司机</span><br><span class="line">   void P2();//售票员</span><br><span class="line">   int main()</span><br><span class="line">   &#123;</span><br><span class="line">   	cobegin</span><br><span class="line">       P1();   p2();</span><br><span class="line">       coend;</span><br><span class="line">   &#125;</span><br><span class="line">   void P1()</span><br><span class="line">   &#123;</span><br><span class="line">   while(1)&#123;</span><br><span class="line">   	P(s1);</span><br><span class="line">       ...</span><br><span class="line">       启动</span><br><span class="line">       正常行驶</span><br><span class="line">       到站</span><br><span class="line">       ...</span><br><span class="line">       V(s2);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   void P2()</span><br><span class="line">   &#123;</span><br><span class="line">   	while(1)</span><br><span class="line">       &#123;</span><br><span class="line">       	关门</span><br><span class="line">       	V(s1);</span><br><span class="line">           售票</span><br><span class="line">           P(s2);</span><br><span class="line">           开门</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>#吃水果</p>
+<p>问题描述<br>
+桌子上有一只盘子，最多可容纳两个水果，每次只能放人或取出一个水果。爸爸专向盘子中放苹果(apple)，妈妈专向盘子中放桔子(orange)，1个儿子专等吃盘子中的桔子，1个女儿专等吃盘子中的苹果。请用P、V操作来实现爸爸、妈妈、儿子、女儿之间的同步与互斥关系。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">int mutex=1;</span><br><span class="line">   int empty=2;</span><br><span class="line">   int apple=0,orange=0;</span><br><span class="line">   void father(), mother();</span><br><span class="line">   void   son(),daughter();</span><br><span class="line">   int main()</span><br><span class="line">   &#123;</span><br><span class="line">   	cobegin</span><br><span class="line">       father(); mother();</span><br><span class="line">       son(); daughter();</span><br><span class="line">       coend;</span><br><span class="line">   &#125;</span><br><span class="line">   void father()</span><br><span class="line">   &#123;</span><br><span class="line">   	while(1)</span><br><span class="line">       &#123;</span><br><span class="line">       	P(empty);</span><br><span class="line">           P(mutex);</span><br><span class="line">           put an apple;</span><br><span class="line">           V(mutex);</span><br><span class="line">           V(apple);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   void mother()</span><br><span class="line">   &#123;</span><br><span class="line">   	while(1)</span><br><span class="line">       &#123;</span><br><span class="line">       	P(empty);</span><br><span class="line">           P(mutex);</span><br><span class="line">           put an orange;</span><br><span class="line">           V(mutex);</span><br><span class="line">           V(orange);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   void son()</span><br><span class="line">   &#123;</span><br><span class="line">   	while(1)</span><br><span class="line">       &#123;</span><br><span class="line">       	P(orange);</span><br><span class="line">           P(mutex);</span><br><span class="line">           eat an oeange;</span><br><span class="line">           V(mutex);</span><br><span class="line">           V(empty);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   void daughter()</span><br><span class="line">   &#123;</span><br><span class="line">   	while(1)</span><br><span class="line">       &#123;</span><br><span class="line">       	P(apple);</span><br><span class="line">           P(mutex);</span><br><span class="line">           eat an apple;</span><br><span class="line">           V(mutex);</span><br><span class="line">           V(empty);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>#独木桥问题<br>
+某条河上只有一座独木桥，以便行人过河。现在河的两边都有人要过桥，按照下面的规则过桥。为了保证过桥安全，请用P、V操作分别实现正确的管理。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">int SA=1,SB=1,mutex=1;</span><br><span class="line">   int countA=0,countB=0;</span><br><span class="line">   void A(),B();</span><br><span class="line">   int main()</span><br><span class="line">   &#123;</span><br><span class="line">   	cobegin</span><br><span class="line">       A();</span><br><span class="line">       B();</span><br><span class="line">       coend;</span><br><span class="line">   &#125;</span><br><span class="line">   void A()</span><br><span class="line">   &#123;</span><br><span class="line">   	P(SA);</span><br><span class="line">       if(countA==0)</span><br><span class="line">       &#123;</span><br><span class="line">       	P(mutex);</span><br><span class="line">           countA++;</span><br><span class="line">       &#125;</span><br><span class="line">       V(SA);</span><br><span class="line">       过独木桥;</span><br><span class="line">       P(SA);</span><br><span class="line">       countA--;</span><br><span class="line">       if(countA==0)</span><br><span class="line">       &#123;</span><br><span class="line">       	V(metux);</span><br><span class="line">       &#125;</span><br><span class="line">       V(SA);</span><br><span class="line">   &#125;</span><br><span class="line">   void B()</span><br><span class="line">   &#123;</span><br><span class="line">   	P(SB);</span><br><span class="line">       if(countB==0)</span><br><span class="line">       &#123;</span><br><span class="line">       	P(mutex);</span><br><span class="line">           countB++;</span><br><span class="line">       &#125;</span><br><span class="line">       V(SB);</span><br><span class="line">       过独木桥;</span><br><span class="line">       P(SB);</span><br><span class="line">       countB--;</span><br><span class="line">       if(countB==0)</span><br><span class="line">       &#123;</span><br><span class="line">       	V(metux);</span><br><span class="line">       &#125;</span><br><span class="line">       V(SB);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://LTitan.github.io/2018/06/13/进程同步问题/" title="进程同步问题" target="_blank" rel="external">https://LTitan.github.io/2018/06/13/进程同步问题/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/ltitan" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/lyf.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/ltitan" target="_blank"><span class="text-dark">LTitan</span><small class="ml-1x">C++/Python &amp; Algorithm</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom="">
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2018/06/16/页面置换算法/" title="操作系统--页面置换算法"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2018/06/08/OpenCV 蒙太奇效果/" title="OpenCV 蒙太奇效果"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope="" itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

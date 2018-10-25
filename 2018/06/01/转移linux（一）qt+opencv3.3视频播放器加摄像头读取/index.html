@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>转移linux（一）qt+opencv3.3视频播放器加摄像头读取 | Hexo</title>
+  <meta name="description" content="windows MFC c# 玩不了了 打算走嵌入式线路了 从opencv自己编译了n天，到今天第一个qt项目，差不多两周吧，自己电脑实体机装了**deep in linux ** 和 windows双系统，所以体验体验linux编程的乐趣  QT cteater的设计师界面效率快的不要不要的，更何况是c++，而且还吹嘘的什么跨平台。 附上开发的设计图  软件截图:  界面来讲还好吧，比mfc好">
+<meta name="keywords" content="opencv">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转移linux（一）qt+opencv3.3视频播放器加摄像头读取">
+<meta property="og:url" content="https://LTitan.github.io/2018/06/01/转移linux（一）qt+opencv3.3视频播放器加摄像头读取/index.html">
+<meta property="og:site_name" content="LTitan`s Blog">
+<meta property="og:description" content="windows MFC c# 玩不了了 打算走嵌入式线路了 从opencv自己编译了n天，到今天第一个qt项目，差不多两周吧，自己电脑实体机装了**deep in linux ** 和 windows双系统，所以体验体验linux编程的乐趣  QT cteater的设计师界面效率快的不要不要的，更何况是c++，而且还吹嘘的什么跨平台。 附上开发的设计图  软件截图:  界面来讲还好吧，比mfc好">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/06/qt1.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/06/video1.png">
+<meta property="og:updated_time" content="2018-10-24T12:40:07.035Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="转移linux（一）qt+opencv3.3视频播放器加摄像头读取">
+<meta name="twitter:description" content="windows MFC c# 玩不了了 打算走嵌入式线路了 从opencv自己编译了n天，到今天第一个qt项目，差不多两周吧，自己电脑实体机装了**deep in linux ** 和 windows双系统，所以体验体验linux编程的乐趣  QT cteater的设计师界面效率快的不要不要的，更何况是c++，而且还吹嘘的什么跨平台。 附上开发的设计图  软件截图:  界面来讲还好吧，比mfc好">
+<meta name="twitter:image" content="https://ltitan.github.io/images/2018/06/qt1.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://LTitan.github.io/2018/06/01/转移linux（一）qt+opencv3.3视频播放器加摄像头读取/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="LTitan`s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+  
+</head>
+
+
+<body class="main-center theme-blue" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/ltitan" target="_blank">
+          <img class="img-circle img-rotate" src="/images/lyf.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">LTitan</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">C++/Python &amp; Algorithm</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Jilin, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索">
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech="">
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope="" itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope="" itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/">OS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data-structure</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opencv/">opencv</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/others/">others</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-转移linux（一）qt+opencv3.3视频播放器加摄像头读取" class="article article-type-post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      转移linux（一）qt+opencv3.3视频播放器加摄像头读取
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2018/06/01/转移linux（一）qt+opencv3.3视频播放器加摄像头读取/" class="article-date">
+	  <time datetime="2018-06-01T01:30:22.000Z" itemprop="datePublished">2018-06-01</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/opencv/">opencv</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2018/06/01/转移linux（一）qt+opencv3.3视频播放器加摄像头读取/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 567(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 2(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h4 id="windows-mfc-c-玩不了了-打算走嵌入式线路了"><a class="markdownIt-Anchor" href="#windows-mfc-c-玩不了了-打算走嵌入式线路了"></a> windows MFC c# 玩不了了 打算走嵌入式线路了</h4>
+<p>从opencv自己编译了n天，到今天第一个qt项目，差不多两周吧，自己电脑实体机装了**deep in linux ** 和 <strong>windows</strong>双系统，所以体验体验linux编程的乐趣</p>
+<hr>
+<p><strong>QT cteater</strong>的设计师界面效率快的不要不要的，更何况是c++，而且还吹嘘的什么跨平台。</p>
+<p>附上开发的设计图</p>
+<p><img src="/images/2018/06/qt1.png" alt="alt"></p>
+<p>软件截图:</p>
+<p><img src="/images/2018/06/video1.png" alt="alt"></p>
+<p>界面来讲还好吧，比mfc好看，主要视频还是用到QT自带的多线程来逐帧播放的，调试了5个小时，哈哈哈还是挺欣慰的，以后打算入手树梅派来做项目了。</p>
+<p>就简单的附上视频的按钮以及核心代码吧</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> MainWindow::on_openFileBtn_clicked()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 打开视频文件按钮 有播放的视频的话会先停止</span></span><br><span class="line">    isOpenFile=<span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">if</span>(capture.isOpened())</span><br><span class="line">    &#123;</span><br><span class="line">        capture.release();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//文件类型的对话框 不需要用指针新建一个类</span></span><br><span class="line">    <span class="comment">//自行可以添加视频格式</span></span><br><span class="line">    QString FileName=QFileDialog::getOpenFileName(<span class="keyword">this</span>,tr(<span class="string">"打开文件"</span>),<span class="string">"."</span>,</span><br><span class="line">                                              tr(<span class="string">"Video Files(*.avi *.mp4 *.flv)"</span>));</span><br><span class="line">    <span class="comment">// capture.open(FileName.toLocal8Bit.data());  //防止字符串乱码转化</span></span><br><span class="line">    capture.open(FileName.toStdString());<span class="comment">//字符串(全英文目录比较好)的转化</span></span><br><span class="line">    <span class="keyword">if</span>(capture.isOpened())</span><br><span class="line">    &#123;</span><br><span class="line">        rate=capture.get(CV_CAP_PROP_FPS);</span><br><span class="line"></span><br><span class="line">       <span class="keyword">if</span>(isOpenFile)</span><br><span class="line">        &#123;</span><br><span class="line">            vd_x=capture.get(CV_CAP_PROP_FRAME_COUNT);</span><br><span class="line">        ui-&gt;videoLong-&gt;setRange(<span class="number">0</span>,vd_x);</span><br><span class="line">            &#125;</span><br><span class="line">        capture&gt;&gt;frame;</span><br><span class="line">        <span class="keyword">if</span>(!frame.empty())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//自适应窗口大小</span></span><br><span class="line">            width_x=ui-&gt;ImageLabel-&gt;width()*<span class="number">1.0</span>/frame.cols;</span><br><span class="line">            height_x=ui-&gt;ImageLabel-&gt;height()*<span class="number">1.0</span>/frame.rows;</span><br><span class="line"></span><br><span class="line">            cv::resize(frame,frame,Size(),width_x,height_x);</span><br><span class="line">        image=Mat2QImage(frame);</span><br><span class="line">        <span class="comment">//显示在label上</span></span><br><span class="line">        ui-&gt;ImageLabel-&gt;setPixmap(QPixmap::fromImage(image));</span><br><span class="line"></span><br><span class="line">            timer=<span class="keyword">new</span> QTimer(<span class="keyword">this</span>);</span><br><span class="line">        <span class="comment">//定时器线程 时间设置 相当与帧率</span></span><br><span class="line">            timer-&gt;setInterval(<span class="number">1000</span>/rate);</span><br><span class="line">            connect(timer,SIGNAL(timeout()),<span class="keyword">this</span>,SLOT(nextFrame()));</span><br><span class="line"></span><br><span class="line">            timer-&gt;start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function">QImage <span class="title">Mat2QImage</span><span class="params">(Mat cvImg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//Mat 类型转 QImage  类似与Mat转bitmap</span></span><br><span class="line">    QImage qImg;</span><br><span class="line">    <span class="comment">//判断通道个数</span></span><br><span class="line">    <span class="keyword">if</span>(cvImg.channels()==<span class="number">3</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        cvtColor(cvImg,cvImg,CV_BGR2RGB);</span><br><span class="line"></span><br><span class="line">        qImg=QImage((<span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> *)(cvImg.data),</span><br><span class="line">                cvImg.cols,cvImg.rows,</span><br><span class="line">                cvImg.cols*cvImg.channels(),</span><br><span class="line">                QImage::Format_RGB888</span><br><span class="line">                );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(cvImg.channels()==<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        qImg=QImage((<span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> *)(cvImg.data),</span><br><span class="line">                cvImg.cols,cvImg.rows,</span><br><span class="line">                cvImg.cols*cvImg.channels(),</span><br><span class="line">                QImage::Format_Indexed8</span><br><span class="line">                );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        qImg=QImage((<span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> *)(cvImg.data),</span><br><span class="line">                cvImg.cols,cvImg.rows,</span><br><span class="line">                cvImg.cols*cvImg.channels(),</span><br><span class="line">                QImage::Format_RGB888</span><br><span class="line">                );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> qImg;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">void</span> MainWindow::nextFrame()</span><br><span class="line">&#123;</span><br><span class="line">    capture&gt;&gt;frame;</span><br><span class="line">    <span class="keyword">if</span>(!frame.empty())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//调整大小</span></span><br><span class="line">        cv::resize(frame,frame,Size(),width_x,height_x);</span><br><span class="line">    image=Mat2QImage(frame);</span><br><span class="line">        ui-&gt;ImageLabel-&gt;setPixmap(QPixmap::fromImage(image));</span><br><span class="line">        <span class="keyword">if</span>(isOpenFile)</span><br><span class="line">        &#123;</span><br><span class="line">            ui-&gt;videoLong-&gt;setValue((<span class="keyword">int</span>)(capture.get(CV_CAP_PROP_POS_FRAMES)));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://LTitan.github.io/2018/06/01/转移linux（一）qt+opencv3.3视频播放器加摄像头读取/" title="转移linux（一）qt+opencv3.3视频播放器加摄像头读取" target="_blank" rel="external">https://LTitan.github.io/2018/06/01/转移linux（一）qt+opencv3.3视频播放器加摄像头读取/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/ltitan" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/lyf.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/ltitan" target="_blank"><span class="text-dark">LTitan</span><small class="ml-1x">C++/Python &amp; Algorithm</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom="">
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2018/06/08/OpenCV 蒙太奇效果/" title="OpenCV 蒙太奇效果"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2018/04/25/图论--最短路径和最小生成树/" title="图论--最短路径和最小生成树"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope="" itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

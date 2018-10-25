@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>数据结构(二) 字符串的常规使用 | Hexo</title>
+  <meta name="description" content="虽然字符串简单，但是在生活中的用处确实很广，就像论文查重，文章检索，没有字符串的数据结构和算法是实现不了的 我在这先放上c语言版的char数组，文章的下篇将介绍c++版的（唉，这两天感觉自己特别能得吧了）。 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525">
+<meta name="keywords" content="data-structure">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构(二) 字符串的常规使用">
+<meta property="og:url" content="https://LTitan.github.io/2018/07/16/数据结构(二) 字符串的常规使用 /index.html">
+<meta property="og:site_name" content="LTitan`s Blog">
+<meta property="og:description" content="虽然字符串简单，但是在生活中的用处确实很广，就像论文查重，文章检索，没有字符串的数据结构和算法是实现不了的 我在这先放上c语言版的char数组，文章的下篇将介绍c++版的（唉，这两天感觉自己特别能得吧了）。 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-09-25T09:38:44.015Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="数据结构(二) 字符串的常规使用">
+<meta name="twitter:description" content="虽然字符串简单，但是在生活中的用处确实很广，就像论文查重，文章检索，没有字符串的数据结构和算法是实现不了的 我在这先放上c语言版的char数组，文章的下篇将介绍c++版的（唉，这两天感觉自己特别能得吧了）。 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://LTitan.github.io/2018/07/16/数据结构(二) 字符串的常规使用 /index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="LTitan`s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+  
+</head>
+
+
+<body class="main-center theme-blue" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/ltitan" target="_blank">
+          <img class="img-circle img-rotate" src="/images/lyf.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">LTitan</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">C++/Python &amp; Algorithm</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Jilin, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索">
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech="">
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope="" itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope="" itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/">OS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data-structure</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opencv/">opencv</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/others/">others</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-数据结构(二) 字符串的常规使用 " class="article article-type-post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      数据结构(二) 字符串的常规使用
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2018/07/16/数据结构(二) 字符串的常规使用 /" class="article-date">
+	  <time datetime="2018-07-16T01:44:59.000Z" itemprop="datePublished">2018-07-16</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/data-structure/">data-structure</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2018/07/16/数据结构(二) 字符串的常规使用 /#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 1.1k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 4(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>虽然字符串简单，但是在生活中的用处确实很广，就像论文查重，文章检索，没有字符串的数据结构和算法是实现不了的</p>
+<p>我在这先放上c语言版的char数组，文章的下篇将介绍c++版的（唉，这两天感觉自己特别能得吧了）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br></pre></td><td class="code"><pre><span class="line">    #include &lt;stdio.h&gt;</span><br><span class="line">    #include &lt;stdlib.h&gt;</span><br><span class="line">    #include &lt;string.h&gt;</span><br><span class="line">    #include &lt;memory.h&gt;</span><br><span class="line"></span><br><span class="line">    //简单点说字符串就是字符数组</span><br><span class="line">    //基本运算无非就是长度 比较 回文 模式匹配(查找)</span><br><span class="line">    //模式匹配和回文我将会单独开文章的,请耐心等等吧 = =</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    //1.求字符串的长度  这里用到strlen函数</span><br><span class="line">    //那为什么不用sizeof(str)/sizeof(char) 计算呢？</span><br><span class="line">    //原因是开辟了1024个长度不一定用满，用sizeof计算呢即为1024,而非字符串长度</span><br><span class="line">    int str_length(char *s)</span><br><span class="line">    &#123;</span><br><span class="line">        return strlen(s);//直接用strlen求解</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //2.字符串比较 就是挨个比较字符串的字符</span><br><span class="line">    //可以用strcmp函数比较  也可以自己手写一个</span><br><span class="line">    int str_comparison_system(char *p,char *q)//函数意思为调用系统函数</span><br><span class="line">    &#123;</span><br><span class="line">        //返回1 即p大  0即一样大小  -1即q大</span><br><span class="line">        return strcmp(p,q);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    int str_comparison_user(char *p,char *q)//这个比较函数为自己写的</span><br><span class="line">    &#123;</span><br><span class="line">        //先求出各自的长度 遍历长度最小的字符串比较,防止越界</span><br><span class="line">        //这是作者自己想到的,有什么好的想法欢迎来补充</span><br><span class="line">        //如果面试提到的话，自己可以借鉴一下</span><br><span class="line">        int lenp=str_length(p);</span><br><span class="line">        int lenq=str_length(q);</span><br><span class="line">        int theMin=lenp&gt;lenq?lenq:lenp;//求出最短的长度</span><br><span class="line"></span><br><span class="line">        for(int i=0;i&lt;theMin;++i)</span><br><span class="line">        &#123;</span><br><span class="line">            if(p[i]==q[i]) continue;</span><br><span class="line">            if(p[i]&gt;q[i]) return 1;</span><br><span class="line">            if(p[i]&lt;q[i]) return -1;</span><br><span class="line">        &#125;</span><br><span class="line">        return lenp&gt;lenq?1:0;//这里的做法是为了防止p的前面与q一致,但是p后面有字符</span><br><span class="line">        //EG：abcdefg  &gt;  abcd</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    int main()</span><br><span class="line">    &#123;</span><br><span class="line">        char str1[1024]=&quot;hello world&quot;;//c语言中我们用char数组表示字符串</span><br><span class="line">        char str2[500]=&quot;hello friends&quot;;</span><br><span class="line"></span><br><span class="line">        printf(&quot;str1的长度:%d  str2的长度:%d\n&quot;,str_length(str1),</span><br><span class="line">               str_length(str2));</span><br><span class="line"></span><br><span class="line">        //测试一下sizeof的区别</span><br><span class="line">        printf(&quot;str1的空间:%d\n&quot;,sizeof(str1)/sizeof(char));//输出1024</span><br><span class="line"></span><br><span class="line">        //字符串系统和自己写的比较</span><br><span class="line">        printf(&quot;系统函数 比较结果:%d\n&quot;,str_comparison_system(str1,str2));</span><br><span class="line">        printf(&quot;自己写函数 比较结果:%d\n&quot;,str_comparison_user(str1,str2));</span><br><span class="line"></span><br><span class="line">        //小福利 送上汇编写的 memory 内存函数的使用</span><br><span class="line"></span><br><span class="line">        memset(str2,0,sizeof(str2));//内存设置  一般把数组清0用</span><br><span class="line">        /*</span><br><span class="line">        参数一是你要设置的数组首地址</span><br><span class="line">        参数二是字节填充大小  注意int是占8或4个字节全填上1的话 结果就肯定不是1了</span><br><span class="line">        参数三是你要填的字节长度</span><br><span class="line">        */</span><br><span class="line">        puts(str2);</span><br><span class="line">        </span><br><span class="line">        memcpy(str2,str1,sizeof(str2));//内存拷贝</span><br><span class="line">        // 与strcpy(str2,str1);大同小异 但实际上mem的效率是大于strcpy的</span><br><span class="line">        //参数一看就懂了  把str1拷贝给str2  但是最后的参数一定是谁短写谁，否则炸内存</span><br><span class="line"></span><br><span class="line">        puts(str2);</span><br><span class="line">        puts(str1);</span><br><span class="line">        return 0;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">c++版的string 数据类型</span><br><span class="line"></span><br><span class="line">    #include &lt;iostream&gt;</span><br><span class="line">    #include &lt;string&gt;</span><br><span class="line">    using namespace std;</span><br><span class="line"></span><br><span class="line">    int main()</span><br><span class="line">    &#123;</span><br><span class="line">        string str1=&quot;hello world&quot;;</span><br><span class="line">        string str2=&quot;hello friends&quot;;</span><br><span class="line">        //哎 是不是有疑问了？不用考虑字串的空间大小么？</span><br><span class="line">        //这里我解释：程序运行实在操作系统的堆上运行的，线程实在栈上运行的</span><br><span class="line">        //既然实在堆上运行的，就看你电脑内存了，所以你就可以不用管了</span><br><span class="line">        //string 可以用[] 下标访问</span><br><span class="line"></span><br><span class="line">        // string 的输入两种方式  空格能输入和不能输入</span><br><span class="line"></span><br><span class="line">        //接收空格的字符串输入</span><br><span class="line">        // getline(cin,str1);//意思就是接收一行 回车生效</span><br><span class="line"></span><br><span class="line">        //不能接收空格的输入</span><br><span class="line">        // cin&gt;&gt;str1;</span><br><span class="line"></span><br><span class="line">        //求字符串的长度 string.length()</span><br><span class="line">        cout&lt;&lt;&quot;str1的长度为&quot;&lt;&lt;str1.length()&lt;&lt;endl;</span><br><span class="line"></span><br><span class="line">        //字符串比较 直接用 &lt;、== 或 &gt; 判断就行了</span><br><span class="line">        cout&lt;&lt;(str1&gt;str2)&lt;&lt;endl;</span><br><span class="line"></span><br><span class="line">        //子串</span><br><span class="line"></span><br><span class="line">        string sub=str1.substr(5,3);//从5的位置截取3个长度  wo</span><br><span class="line"></span><br><span class="line">        cout&lt;&lt;sub&lt;&lt;endl;</span><br><span class="line"></span><br><span class="line">        //查找 时间效率为O(nlog(n)) 原理就是用的模式匹配</span><br><span class="line">        int flag=str1.find(&quot;lyf&quot;);//找不到返回-1 找到返回下标</span><br><span class="line">        cout&lt;&lt;flag&lt;&lt;endl;</span><br><span class="line"></span><br><span class="line">        //删除 n个 和 全部</span><br><span class="line">        str1.erase(3,4);//从3的位置删除4个</span><br><span class="line">        cout&lt;&lt;str1&lt;&lt;endl;</span><br><span class="line">        str1.clear();//全部删除</span><br><span class="line">         cout&lt;&lt;str1&lt;&lt;endl;</span><br><span class="line"></span><br><span class="line">         //加法 连接运算符</span><br><span class="line">         cout&lt;&lt;(str1+str2)&lt;&lt;endl;</span><br><span class="line">        return 0;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://LTitan.github.io/2018/07/16/数据结构(二) 字符串的常规使用 /" title="数据结构(二) 字符串的常规使用" target="_blank" rel="external">https://LTitan.github.io/2018/07/16/数据结构(二) 字符串的常规使用 /</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/ltitan" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/lyf.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/ltitan" target="_blank"><span class="text-dark">LTitan</span><small class="ml-1x">C++/Python &amp; Algorithm</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom="">
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2018/07/16/数据结构(四) 双向循环链表 /" title="数据结构(四) 双向循环链表"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2018/07/16/数据结构(三) 字符串模式匹配KMP和基于哈希的匹配/" title="数据结构(三) 字符串模式匹配KMP和基于哈希的匹配"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope="" itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

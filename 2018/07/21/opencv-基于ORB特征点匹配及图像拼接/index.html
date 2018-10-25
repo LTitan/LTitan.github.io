@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>opencv:基于ORB特征点匹配及图像拼接 | Hexo</title>
+  <meta name="description" content="#ORB简述 ORB（Oriented FAST and Rotated BRIEF）是一种快速特征点提取和描述的算法。ORB算法分为两部分，分别是特征点提取和特征点描述。特征提取是由FAST（Features from Accelerated Segment Test）算法发展来的，特征点描述是根据BRIEF（Binary Robust IndependentElementary Feature">
+<meta name="keywords" content="opencv">
+<meta property="og:type" content="article">
+<meta property="og:title" content="opencv:基于ORB特征点匹配及图像拼接">
+<meta property="og:url" content="https://LTitan.github.io/2018/07/21/opencv-基于ORB特征点匹配及图像拼接/index.html">
+<meta property="og:site_name" content="LTitan`s Blog">
+<meta property="og:description" content="#ORB简述 ORB（Oriented FAST and Rotated BRIEF）是一种快速特征点提取和描述的算法。ORB算法分为两部分，分别是特征点提取和特征点描述。特征提取是由FAST（Features from Accelerated Segment Test）算法发展来的，特征点描述是根据BRIEF（Binary Robust IndependentElementary Feature">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/07/ORB.jpg">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/07/yy.jpg">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/07/zz.jpg">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/07/match.jpg">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/07/pin.jpg">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/07/over.jpg">
+<meta property="og:updated_time" content="2018-09-25T09:25:38.824Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="opencv:基于ORB特征点匹配及图像拼接">
+<meta name="twitter:description" content="#ORB简述 ORB（Oriented FAST and Rotated BRIEF）是一种快速特征点提取和描述的算法。ORB算法分为两部分，分别是特征点提取和特征点描述。特征提取是由FAST（Features from Accelerated Segment Test）算法发展来的，特征点描述是根据BRIEF（Binary Robust IndependentElementary Feature">
+<meta name="twitter:image" content="https://ltitan.github.io/images/2018/07/ORB.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://LTitan.github.io/2018/07/21/opencv-基于ORB特征点匹配及图像拼接/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="LTitan`s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+  
+</head>
+
+
+<body class="main-center theme-blue" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/ltitan" target="_blank">
+          <img class="img-circle img-rotate" src="/images/lyf.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">LTitan</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">C++/Python &amp; Algorithm</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Jilin, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索">
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech="">
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope="" itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope="" itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/">OS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data-structure</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opencv/">opencv</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/others/">others</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-opencv-基于ORB特征点匹配及图像拼接" class="article article-type-post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      opencv:基于ORB特征点匹配及图像拼接
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2018/07/21/opencv-基于ORB特征点匹配及图像拼接/" class="article-date">
+	  <time datetime="2018-07-21T02:18:59.000Z" itemprop="datePublished">2018-07-21</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/opencv/">opencv</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2018/07/21/opencv-基于ORB特征点匹配及图像拼接/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 1k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 5(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>#ORB简述<br>
+ORB（Oriented FAST and Rotated BRIEF）是一种快速特征点提取和描述的算法。ORB算法分为两部分，分别是特征点提取和特征点描述。特征提取是由FAST（Features from Accelerated Segment Test）算法发展来的，特征点描述是根据BRIEF（Binary Robust IndependentElementary Features）特征描述算法改进的。ORB特征是将FAST特征点的检测方法与BRIEF特征描述子结合起来，并在它们原来的基础上做了改进与优化。</p>
+<p>下图是我在高数课本上进行的测试:</p>
+<p><img src="/images/2018/07/ORB.jpg" alt="alt"></p>
+<p>#特征点匹配</p>
+<p>例子里采集了3000个点吧对比一下，opencv3.3以后好像用上了智能指针Ptr对象，对象的创建只能用ptr模板创建，大概是因为图像再处理的过程中防止异常错误正常抛出吧。<br>
+两张原图：</p>
+<p><img src="/images/2018/07/yy.jpg" alt="alt"><br>
+<img src="/images/2018/07/zz.jpg" alt="alt"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">Mat image_src1,image_src2;</span><br><span class="line">   Mat image_gray1,image_gray2;</span><br><span class="line">   image_src1=imread(&quot;D:\\yy.jpg&quot;);</span><br><span class="line">   cvtColor(image_src1,image_gray1,COLOR_BGR2GRAY);//转为灰度图</span><br><span class="line">   image_src2=imread(&quot;D:\\zz.jpg&quot;);</span><br><span class="line">   cvtColor(image_src2,image_gray2,COLOR_BGR2GRAY);//转为灰度图</span><br><span class="line"></span><br><span class="line">   Ptr&lt;Feature2D&gt; oDetectors=ORB::create(3000);//创建orb对象，采集特征点</span><br><span class="line">   vector&lt;KeyPoint&gt; KeyPoints1,KeyPoints2;//关键点数组</span><br><span class="line"></span><br><span class="line">   oDetectors-&gt;detect(image_gray1,KeyPoints1);//采集左图特征点</span><br><span class="line">   oDetectors-&gt;detect(image_gray2,KeyPoints2);//采集右图特征点</span><br><span class="line"></span><br><span class="line">   Mat imageDec1,imageDec2;</span><br><span class="line">   Ptr&lt;Feature2D&gt; ptor=ORB::create();//创建一个新的oeb对象，当然也可以用上面那个</span><br><span class="line">   ptor-&gt;compute(image_gray1,KeyPoints1,imageDec1);//描述特征点</span><br><span class="line">   ptor-&gt;compute(image_gray2,KeyPoints2,imageDec2);//描述特征点</span><br><span class="line"></span><br><span class="line">   flann::Index flannIndex(imageDec1,LshIndexParams(12,20,2),</span><br><span class="line">                           cvflann::FLANN_DIST_HAMMING);</span><br><span class="line"></span><br><span class="line">   vector&lt;DMatch&gt; goodMatchPoints;</span><br><span class="line">   Mat matchIndex(imageDec2.rows,2,CV_32SC1);</span><br><span class="line">   Mat matchDistance(imageDec2.rows,2,CV_32FC1);</span><br><span class="line"></span><br><span class="line">   flannIndex.knnSearch(imageDec2,matchIndex,matchDistance,2,flann::SearchParams());//采用k近似值 将匹配的索引和距离计算出来</span><br><span class="line"></span><br><span class="line">   for(int i=0;i &lt; matchDistance.rows;i++)</span><br><span class="line">   &#123;</span><br><span class="line">       float t=matchDistance.at&lt;float&gt;(i,0);</span><br><span class="line">       float s=matchDistance.at&lt;float&gt;(i,1);</span><br><span class="line">       if(t&lt;s*0.46)//相似度大约为0.46就算相符</span><br><span class="line">       &#123;</span><br><span class="line">           DMatch part_matches(i,matchIndex.at&lt;int&gt;(i,0),t);</span><br><span class="line">           goodMatchPoints.push_back(part_matches);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line">   Mat first_matching;</span><br><span class="line">   drawMatches(image_src2,KeyPoints2,image_src1,KeyPoints1,</span><br><span class="line">               goodMatchPoints,first_matching);</span><br><span class="line">   imshow(&quot;Match&quot;,first_matching);</span><br></pre></td></tr></table></figure>
+<p>如图，匹配完成:<br>
+<img src="/images/2018/07/match.jpg" alt="alt"></p>
+<p>#拼接<br>
+记录相似点，将另一图像适度旋转调整，然后拼接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;Point2f&gt; Conners(4);// 左上角 左下角 右上角 右下角</span><br><span class="line"></span><br><span class="line">void calcCorners(const Mat&amp; homo,const Mat&amp; input)</span><br><span class="line">&#123;</span><br><span class="line">    double v2[]=&#123;0,0,1&#125;;</span><br><span class="line">    double v1[3];//改变后值</span><br><span class="line">    Mat V2=Mat(3,1,CV_64FC1,v2);</span><br><span class="line">    Mat V1=Mat(3,1,CV_64FC1,v1);</span><br><span class="line">    //下面都是重复代码计算看懂一个即可</span><br><span class="line">    V1=homo*V2;</span><br><span class="line">    Conners[0].x=v1[0]/v1[2];</span><br><span class="line">    Conners[0].y=v1[1]/v1[2];</span><br><span class="line"></span><br><span class="line">    v2[0]=0;</span><br><span class="line">    v2[1]=input.rows;</span><br><span class="line">    v2[2]=1;</span><br><span class="line">    V2=Mat(3,1,CV_64FC1,v2);</span><br><span class="line">    V1=Mat(3,1,CV_64FC1,v1);</span><br><span class="line">    V1=homo*V2;</span><br><span class="line">    Conners[1].x=v1[0]/v1[2];</span><br><span class="line">    Conners[1].y=v1[1]/v1[2];</span><br><span class="line"></span><br><span class="line">    v2[0]=input.cols;</span><br><span class="line">    v2[1]=0;</span><br><span class="line">    v2[2]=1;</span><br><span class="line">    V2=Mat(3,1,CV_64FC1,v2);</span><br><span class="line">    V1=Mat(3,1,CV_64FC1,v1);</span><br><span class="line">    V1=homo*V2;</span><br><span class="line">    Conners[2].x=v1[0]/v1[2];</span><br><span class="line">    Conners[2].y=v1[1]/v1[2];</span><br><span class="line"></span><br><span class="line">    v2[0]=input.cols;</span><br><span class="line">    v2[1]=input.rows;</span><br><span class="line">    v2[2]=1;</span><br><span class="line">    V2=Mat(3,1,CV_64FC1,v2);</span><br><span class="line">    V1=Mat(3,1,CV_64FC1,v1);</span><br><span class="line">    V1=homo*V2;</span><br><span class="line">    Conners[3].x=v1[0]/v1[2];</span><br><span class="line">    Conners[3].y=v1[1]/v1[2];</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">main:://此处接着标题二的代码</span><br><span class="line"></span><br><span class="line">vector&lt;Point2f&gt; image_points1,image_points2;</span><br><span class="line"></span><br><span class="line">    for(auto x:goodMatchPoints)</span><br><span class="line">    &#123;</span><br><span class="line">        image_points2.push_back(KeyPoints2[x.queryIdx].pt);</span><br><span class="line">        image_points1.push_back(KeyPoints1[x.trainIdx].pt);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Mat homo=findHomography(image_points1,image_points2,CV_RANSAC);</span><br><span class="line"></span><br><span class="line">    cout&lt;&lt;&quot;homo matrix:&quot;&lt;&lt;homo&lt;&lt;endl;</span><br><span class="line"></span><br><span class="line">    calcCorners(homo,image_src1);</span><br><span class="line">    Mat imageTransform1,imageTransform2;</span><br><span class="line">    warpPerspective(image_src1,imageTransform1,homo,Size(max(Conners[2].x,</span><br><span class="line">                    Conners[3].x),image_src2.rows));</span><br><span class="line">    imshow(&quot;12&quot;,imageTransform1);</span><br><span class="line"></span><br><span class="line">    int dst_width=imageTransform1.cols;</span><br><span class="line">    int dst_height=image_src2.rows;</span><br><span class="line"></span><br><span class="line">    Mat dst(dst_height,dst_width,CV_8UC3);</span><br><span class="line">    dst.setTo(0);</span><br><span class="line">    imageTransform1.copyTo(dst(Rect(0,0,imageTransform1.cols,imageTransform1.rows)));</span><br><span class="line"></span><br><span class="line">    image_src2.copyTo(dst(Rect(0,0,image_src2.cols,image_src2.rows)));</span><br><span class="line">    imshow(&quot;pin&quot;,dst);</span><br></pre></td></tr></table></figure>
+<p>拼接完，如图：<br>
+<img src="/images/2018/07/pin.jpg" alt="alt"></p>
+<p>#优化拼接处<br>
+此处是借鉴别人的，因为自己也不可能凭空想到，哈哈，修复拼接处的线条问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">void optimizated(Mat &amp;src,Mat &amp;trans,Mat &amp;dst)</span><br><span class="line">&#123;</span><br><span class="line">    int start=min(Conners[0].x,Conners[1].x);</span><br><span class="line">    double processWidth=src.cols-start;</span><br><span class="line"></span><br><span class="line">    int rows=dst.rows;</span><br><span class="line">    int cols=src.cols;</span><br><span class="line">    double alpha=1;</span><br><span class="line"></span><br><span class="line">    for(int i=0;i&lt;rows;++i)</span><br><span class="line">    &#123;</span><br><span class="line">        uchar *p=src.ptr&lt;uchar&gt;(i);</span><br><span class="line">        uchar *t=trans.ptr&lt;uchar&gt;(i);</span><br><span class="line">        uchar *d=dst.ptr&lt;uchar&gt;(i);</span><br><span class="line">        for(int j=start;j&lt;cols;++j)</span><br><span class="line">        &#123;</span><br><span class="line">            int k=j*3;</span><br><span class="line">            if(t[k]==0&amp;&amp;t[k+1]==0&amp;&amp;t[k+2]==0) alpha=1;</span><br><span class="line">            else alpha=(processWidth-j+start)/processWidth;</span><br><span class="line"></span><br><span class="line">            d[k]=p[k]*alpha+t[k]*(1-alpha);</span><br><span class="line">            d[k+1]=p[k+1]*alpha+t[k+1]*(1-alpha);</span><br><span class="line">            d[k+2]=p[k+2]*alpha+t[k+2]*(1-alpha);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>成品图效果如下:</p>
+<p><img src="/images/2018/07/over.jpg" alt="alt"></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://LTitan.github.io/2018/07/21/opencv-基于ORB特征点匹配及图像拼接/" title="opencv:基于ORB特征点匹配及图像拼接" target="_blank" rel="external">https://LTitan.github.io/2018/07/21/opencv-基于ORB特征点匹配及图像拼接/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/ltitan" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/lyf.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/ltitan" target="_blank"><span class="text-dark">LTitan</span><small class="ml-1x">C++/Python &amp; Algorithm</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom="">
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2018/07/25/基于orb的图像矫正/" title="基于ORB的图像矫正"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2018/07/16/数据结构(四) 双向循环链表 /" title="数据结构(四) 双向循环链表"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope="" itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

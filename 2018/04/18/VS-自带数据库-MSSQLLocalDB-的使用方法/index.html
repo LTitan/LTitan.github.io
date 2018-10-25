@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>VS 自带数据库 MSSQLLocalDB 的使用方法 | Hexo</title>
+  <meta name="description" content="话说数据库开课了，机房用的是SQL server2008 r2,微软的这个东西有点大，但是已经有vs的童鞋有福利了，因为vs自带一个MSSqlLocalDatabase ，就是一个本地链接的数据库，我这里演示的是VS2015教程，2013、2017应该都可以的。  ##下面开始教程 #####首先打开vs 1、找到菜单栏，点击工具，找到连接SQL Server，如下图  2、然后会弹出这个窗口，选">
+<meta name="keywords" content="others">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VS 自带数据库 MSSQLLocalDB 的使用方法">
+<meta property="og:url" content="https://LTitan.github.io/2018/04/18/VS-自带数据库-MSSQLLocalDB-的使用方法/index.html">
+<meta property="og:site_name" content="LTitan`s Blog">
+<meta property="og:description" content="话说数据库开课了，机房用的是SQL server2008 r2,微软的这个东西有点大，但是已经有vs的童鞋有福利了，因为vs自带一个MSSqlLocalDatabase ，就是一个本地链接的数据库，我这里演示的是VS2015教程，2013、2017应该都可以的。  ##下面开始教程 #####首先打开vs 1、找到菜单栏，点击工具，找到连接SQL Server，如下图  2、然后会弹出这个窗口，选">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/1.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/2.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/3.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/4.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/5.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/6.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/7.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/8.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/9.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/10.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/11.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/12.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/04/13.png">
+<meta property="og:updated_time" content="2018-10-24T12:39:02.190Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="VS 自带数据库 MSSQLLocalDB 的使用方法">
+<meta name="twitter:description" content="话说数据库开课了，机房用的是SQL server2008 r2,微软的这个东西有点大，但是已经有vs的童鞋有福利了，因为vs自带一个MSSqlLocalDatabase ，就是一个本地链接的数据库，我这里演示的是VS2015教程，2013、2017应该都可以的。  ##下面开始教程 #####首先打开vs 1、找到菜单栏，点击工具，找到连接SQL Server，如下图  2、然后会弹出这个窗口，选">
+<meta name="twitter:image" content="https://ltitan.github.io/images/2018/04/1.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://LTitan.github.io/2018/04/18/VS-自带数据库-MSSQLLocalDB-的使用方法/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="LTitan`s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+  
+</head>
+
+
+<body class="main-center theme-blue" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/ltitan" target="_blank">
+          <img class="img-circle img-rotate" src="/images/lyf.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">LTitan</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">C++/Python &amp; Algorithm</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Jilin, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索">
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech="">
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope="" itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope="" itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/">OS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data-structure</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opencv/">opencv</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/others/">others</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-VS-自带数据库-MSSQLLocalDB-的使用方法" class="article article-type-post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      VS 自带数据库 MSSQLLocalDB 的使用方法
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2018/04/18/VS-自带数据库-MSSQLLocalDB-的使用方法/" class="article-date">
+	  <time datetime="2018-04-18T05:30:22.000Z" itemprop="datePublished">2018-04-18</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/others/">others</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2018/04/18/VS-自带数据库-MSSQLLocalDB-的使用方法/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 338(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 1(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>话说数据库开课了，机房用的是SQL server2008 r2,微软的这个东西有点大，但是已经有vs的童鞋有福利了，因为vs自带一个MSSqlLocalDatabase ，就是一个本地链接的数据库，我这里演示的是<strong>VS2015</strong>教程，2013、2017应该都可以的。</p>
+<hr>
+<p>##下面开始教程</p>
+<p>#####首先打开vs</p>
+<p><strong>1、找到菜单栏，点击工具，找到连接SQL Server，如下图</strong></p>
+<p><img src="/images/2018/04/1.png" alt="alt"></p>
+<p><strong>2、然后会弹出这个窗口，选择本地，选择MsSqlLocalDB，然后连接，注意一定是windows验证才可以，如图</strong></p>
+<p><img src="/images/2018/04/2.png" alt="alt"></p>
+<p><strong>3、会在VS侧栏有个 SQl Server对象资源管理器，如下图，没找到这个窗口的，再看下个图</strong></p>
+<p><img src="/images/2018/04/3.png" alt="alt"></p>
+<p><img src="/images/2018/04/4.png" alt="alt"></p>
+<p><strong>4、打开这个数据库，就是那个小箭头，添加新数据库，我这个例子呢是用的教材P71 的习题6，你们也可以换其他的测试</strong></p>
+<p><img src="/images/2018/04/5.png" alt="alt"></p>
+<p><strong>5、经常用的，起个新名字，放个路径</strong></p>
+<p><img src="/images/2018/04/6.png" alt="alt"></p>
+<p><img src="/images/2018/04/7.png" alt="alt"></p>
+<p><strong>6、打开这个新建的数据库（小箭头），然后鼠标右键，新建查询</strong></p>
+<p><img src="/images/2018/04/8.png" alt="alt"></p>
+<p><strong>7、写你自己定义的SQL语句，然后执行脚本，最后刷新数据库，就会完成操作</strong></p>
+<p><img src="/images/2018/04/9.png" alt="alt"></p>
+<p><img src="/images/2018/04/10.png" alt="alt"></p>
+<p><img src="/images/2018/04/11.png" alt="alt"></p>
+<p><strong>8、最后给表添加数据，这里先不考虑SQL语言插入了，显示表之后，自己往上填就行了</strong></p>
+<p><img src="/images/2018/04/12.png" alt="alt"></p>
+<p><img src="/images/2018/04/13.png" alt="alt"></p>
+<p>除掉了烦人的sqlserver安装，还是挺省事吧。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://LTitan.github.io/2018/04/18/VS-自带数据库-MSSQLLocalDB-的使用方法/" title="VS 自带数据库 MSSQLLocalDB 的使用方法" target="_blank" rel="external">https://LTitan.github.io/2018/04/18/VS-自带数据库-MSSQLLocalDB-的使用方法/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/ltitan" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/lyf.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/ltitan" target="_blank"><span class="text-dark">LTitan</span><small class="ml-1x">C++/Python &amp; Algorithm</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom="">
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2018/04/25/图论--最短路径和最小生成树/" title="图论--最短路径和最小生成树"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2018/03/28/OpenCV-帧差法运动物体追踪/" title="OpenCV 帧差法运动物体追踪"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope="" itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

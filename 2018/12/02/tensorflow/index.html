@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>TensorFlow 使用及手写字体训练 | Hexo</title>
+  <meta name="description" content="tensorflow入门 TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Go">
+<meta name="keywords" content="DeepLearning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TensorFlow 使用及手写字体训练">
+<meta property="og:url" content="https://LTitan.github.io/2018/12/02/tensorflow/index.html">
+<meta property="og:site_name" content="LTitan`s Blog">
+<meta property="og:description" content="tensorflow入门 TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Go">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/12/layer.jpg">
+<meta property="og:image" content="https://ltitan.github.io/images/2018/12/view.png">
+<meta property="og:updated_time" content="2018-12-02T11:53:18.530Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TensorFlow 使用及手写字体训练">
+<meta name="twitter:description" content="tensorflow入门 TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Go">
+<meta name="twitter:image" content="https://ltitan.github.io/images/2018/12/layer.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://LTitan.github.io/2018/12/02/tensorflow/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="LTitan`s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+  
+</head>
+
+
+<body class="main-center theme-blue" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/ltitan" target="_blank">
+          <img class="img-circle img-rotate" src="/images/lyf.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">LTitan</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">C++/Python &amp; Algorithm</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Jilin, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索">
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech="">
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope="" itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope="" itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/DeepLearning/">DeepLearning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/">OS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data-structure</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opencv/">opencv</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/others/">others</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-tensorflow" class="article article-type-post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      TensorFlow 使用及手写字体训练
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2018/12/02/tensorflow/" class="article-date">
+	  <time datetime="2018-12-02T11:30:22.000Z" itemprop="datePublished">2018-12-02</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/DeepLearning/">DeepLearning</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2018/12/02/tensorflow/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 1.5k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 6(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="tensorflow入门"><a class="markdownIt-Anchor" href="#tensorflow入门"></a> tensorflow入门</h1>
+<p>TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Google机器智能研究机构）的研究员和工程师们开发出来，用于机器学习和深度神经网络方面的研究，但这个系统的通用性使其也可广泛用于其他计算领域。(复制过来的)<br>
+中文社区链接:<a href="http://www.tensorfly.cn/" target="_blank" rel="noopener">链接</a></p>
+<h2 id="安装"><a class="markdownIt-Anchor" href="#安装"></a> 安装:</h2>
+<p>python3:<br>
+终端下执行: pip(或者pip3) install --upgrade tensourflow</p>
+<h2 id="优势"><a class="markdownIt-Anchor" href="#优势"></a> 优势:</h2>
+<p>我们在进行深度学习的使用往往会进行后向传播，后向传播的实质是根据神经元微分求解，而tensorflow则不用考虑微积分，只实现前向传播就能运行。</p>
+<h1 id="fb-c-b3bc"><a class="markdownIt-Anchor" href="#fb-c-b3bc"></a> f(b, c) = (b+3)*(b+c)</h1>
+<p>用tensorflow实现此函数（jupyter写的有输出内容）,如下:</p>
+<h2 id="单个值测试"><a class="markdownIt-Anchor" href="#单个值测试"></a> 单个值测试</h2>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf <span class="comment">#导入tf包</span></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np <span class="comment">#导入数组包</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">用tensorflow 实现 f(c, b) = (b+3)*(b+c)</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+<pre><code>'\n用tensorflow 实现 f(c, b) = (b+3)*(b+c)\n'
+</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">b = tf.Variable(<span class="number">2.</span>, name=<span class="string">'b'</span>) <span class="comment">#定义一个2.0变量为b</span></span><br><span class="line">c = tf.Variable(<span class="number">3.</span>, name=<span class="string">'c'</span>) <span class="comment">#定义一个3.0变量为c</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#不妨设中间变量 e = (b+3) ,d = (b+c) ,a= f(b, c)吧</span></span><br><span class="line">three = tf.constant(<span class="number">3.</span>, name=<span class="string">'three'</span>) <span class="comment">#定义一个常量3</span></span><br><span class="line"></span><br><span class="line">e = tf.add(b,three)</span><br><span class="line">d = tf.add(b, c)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = tf.multiply(e, d) <span class="comment">#乘法</span></span><br><span class="line">print(a) <span class="comment">#结果不是25 而是一个Tensor</span></span><br></pre></td></tr></table></figure>
+<pre><code>Tensor(&quot;Mul:0&quot;, shape=(), dtype=float32)
+</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#真实的运行结果如下:</span></span><br><span class="line">init_top = tf.global_variables_initializer() <span class="comment">#初始化变量</span></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    <span class="comment">#打开一个tensor会话</span></span><br><span class="line">    sess.run(init_top) <span class="comment">#顺序不能变，先运行初始化</span></span><br><span class="line">    f = sess.run(a) <span class="comment">#运行tensor a</span></span><br><span class="line">    print(f)</span><br><span class="line">    sess.close() <span class="comment">#关闭会话</span></span><br></pre></td></tr></table></figure>
+<pre><code>25.0
+</code></pre>
+<h2 id="多组值测试"><a class="markdownIt-Anchor" href="#多组值测试"></a> 多组值测试</h2>
+<p>这时候我们用到tensorflow的容器</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf <span class="comment">#导入tf包</span></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np <span class="comment">#导入数组包</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">b = tf.placeholder(tf.float32, [<span class="keyword">None</span>, <span class="number">1</span>],name=<span class="string">'b'</span>) <span class="comment">#定义一个b容器,大小可以不确定,[3,1]即为3个元素,None,为未知，来源数据大小</span></span><br><span class="line">c = tf.Variable(<span class="number">3.</span>, name=<span class="string">'c'</span>) <span class="comment">#定义一个3.0变量为c</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#不妨设中间变量 e = (b+3) ,d = (b+c) ,a= f(b, c)吧</span></span><br><span class="line">three = tf.constant(<span class="number">3.</span>, name=<span class="string">'three'</span>) <span class="comment">#定义一个常量3</span></span><br><span class="line">e = tf.add(b,three)</span><br><span class="line">d = tf.add(b, c)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = tf.multiply(e, d) <span class="comment">#乘法</span></span><br><span class="line">print(a) <span class="comment">#结果不是25 而是一个Tensor</span></span><br></pre></td></tr></table></figure>
+<pre><code>Tensor(&quot;Mul:0&quot;, shape=(?, 1), dtype=float32)
+</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#真实的运行结果如下:</span></span><br><span class="line">b_array = np.array([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]).reshape(<span class="number">5</span>,<span class="number">1</span>) <span class="comment">#创建一个b的元素数组</span></span><br><span class="line">init_top = tf.global_variables_initializer() <span class="comment">#初始化变量</span></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    <span class="comment">#打开一个tensor会话</span></span><br><span class="line">    sess.run(init_top) <span class="comment">#顺序不能变，先运行初始化</span></span><br><span class="line">    f = sess.run(a,feed_dict=&#123;b: b_array&#125;) <span class="comment">#运行tensor a, 喂食词典 b的元素 来源于 b_array</span></span><br><span class="line">    print(f) <span class="comment">#输出必然是多组值</span></span><br><span class="line">    sess.close() <span class="comment">#关闭会话</span></span><br></pre></td></tr></table></figure>
+<pre><code>[[16.]
+ [25.]
+ [36.]
+ [49.]
+ [64.]]
+</code></pre>
+<p>好了函数介绍就到这</p>
+<h1 id="mnist-手写字体训练"><a class="markdownIt-Anchor" href="#mnist-手写字体训练"></a> MNIST 手写字体训练</h1>
+<p>注释解释的很清楚，推荐有基础的人去看，新手会完全看不懂的</p>
+<p><img src="/images/2018/12/layer.jpg" alt=""></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> tensorflow.examples.tutorials.mnist <span class="keyword">import</span> input_data</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">%matplotlib inline</span><br><span class="line">plt.rcParams[<span class="string">'figure.figsize'</span>] = (<span class="number">13.0</span>, <span class="number">11.0</span>) <span class="comment">#设置plt的大小</span></span><br><span class="line">plt.rcParams[<span class="string">'image.interpolation'</span>] = <span class="string">'nearest'</span></span><br><span class="line">plt.rcParams[<span class="string">'image.cmap'</span>] = <span class="string">'gray'</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mnist = input_data.read_data_sets(<span class="string">'MNIST_data/'</span>, one_hot=<span class="keyword">True</span>)  <span class="comment">#加载mnist数据集</span></span><br></pre></td></tr></table></figure>
+<pre><code>Extracting MNIST_data/train-images-idx3-ubyte.gz
+Extracting MNIST_data/train-labels-idx1-ubyte.gz
+Extracting MNIST_data/t10k-images-idx3-ubyte.gz
+Extracting MNIST_data/t10k-labels-idx1-ubyte.gz
+</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">learning_rate = <span class="number">0.05</span>  <span class="comment">#学习率</span></span><br><span class="line">epochs = <span class="number">20</span> <span class="comment">#迭代大次数</span></span><br><span class="line">batch_size = <span class="number">50</span> <span class="comment">#迭代小次数，也是每次训练数据集的数据量  总次数 20*50</span></span><br><span class="line">x = tf.placeholder(tf.float32, [<span class="keyword">None</span>, <span class="number">784</span>], name=<span class="string">'x'</span>) <span class="comment">#定义变量x 原图为64*64的数据</span></span><br><span class="line">y = tf.placeholder(tf.float32, [<span class="keyword">None</span>, <span class="number">10</span>], name=<span class="string">'y'</span>) <span class="comment">#</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#设置了3层神经元结构  第一次为300个 第二层 200个 最后输出层 10</span></span><br><span class="line">W1 = tf.Variable(tf.random_normal([<span class="number">784</span>, <span class="number">300</span>], stddev=<span class="number">0.01</span>), name=<span class="string">'W1'</span>)</span><br><span class="line"><span class="comment">#tf的正则化表示，不了解的可以忽略下行</span></span><br><span class="line">tf.add_to_collection(<span class="string">'losses'</span>, tf.contrib.layers.l2_regularizer(<span class="number">0.005</span>)(W1))</span><br><span class="line">b1 = tf.Variable(tf.random_normal([<span class="number">300</span>]), name=<span class="string">'b1'</span>)</span><br><span class="line">W2 = tf.Variable(tf.random_normal([<span class="number">300</span>, <span class="number">200</span>], stddev=<span class="number">0.01</span>), name=<span class="string">'W2'</span>)</span><br><span class="line">tf.add_to_collection(<span class="string">'losses'</span>, tf.contrib.layers.l2_regularizer(<span class="number">0.005</span>)(W2))</span><br><span class="line">b2 = tf.Variable(tf.random_normal([<span class="number">200</span>]), name=<span class="string">'b2'</span>)</span><br><span class="line">W3 = tf.Variable(tf.random_normal([<span class="number">200</span>, <span class="number">10</span>], stddev=<span class="number">0.01</span>), name=<span class="string">'W3'</span>)</span><br><span class="line">b3 = tf.Variable(tf.random_normal([<span class="number">10</span>]), name=<span class="string">'b3'</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hd_out1 = tf.add(tf.matmul(x,W1), b1)</span><br><span class="line">hd_out1 = tf.nn.relu(hd_out1) <span class="comment">#第一层的输出 用的是relu函数</span></span><br><span class="line"></span><br><span class="line">hd_out2 = tf.add(tf.matmul(hd_out1,W2), b2)</span><br><span class="line">hd_out2 = tf.nn.relu(hd_out2) <span class="comment">#第二层的输出</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">y_ = tf.nn.softmax(tf.add(tf.matmul(hd_out2, W3), b3)) <span class="comment">#最终输出 个数为10</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">y_clipped = tf.clip_by_value(y_, <span class="number">1e-10</span>, <span class="number">0.9999999</span>) <span class="comment">#过滤</span></span><br><span class="line">cross_entropy = -tf.reduce_mean(tf.reduce_sum(y*tf.log(y_clipped)+(<span class="number">1</span>-y)*tf.log(<span class="number">1</span>-y_clipped), axis=<span class="number">1</span>)) <span class="comment">#求解交叉熵</span></span><br><span class="line">tf.add_to_collection(<span class="string">'losses'</span>, cross_entropy)</span><br><span class="line">loss = tf.add_n(tf.get_collection(<span class="string">'losses'</span>)) <span class="comment">#将交叉熵放入losses集，下面会用到</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">optimizer = tf.train.GradientDescentOptimizer(learning_rate)</span><br><span class="line">train = optimizer.minimize(loss) <span class="comment">#选用梯度下降算法，来进行学习，选用losses里面的最小值</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">init_top = tf.global_variables_initializer()</span><br><span class="line">correct_prediction = tf.equal(tf.argmax(y, <span class="number">1</span>), tf.argmax(y_, <span class="number">1</span>))</span><br><span class="line">accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32)) <span class="comment">#求正确率</span></span><br><span class="line"><span class="comment">#保存模型</span></span><br><span class="line">saver = tf.train.Saver()</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    sess.run(init_top)</span><br><span class="line">    total_batch = int(len(mnist.train.labels)/ batch_size)</span><br><span class="line">    costs = []</span><br><span class="line">    <span class="keyword">for</span> ep <span class="keyword">in</span> range(epochs):</span><br><span class="line">        avg_cost = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(total_batch):</span><br><span class="line">            batch_x, batch_y = mnist.train.next_batch(batch_size)</span><br><span class="line">            _t, c = sess.run([train, cross_entropy], feed_dict=&#123;x:batch_x, y:batch_y&#125;)</span><br><span class="line">            avg_cost += c/total_batch</span><br><span class="line">        print(<span class="string">'epoch%d,cost=%f'</span>% (ep+<span class="number">1</span>,avg_cost))</span><br><span class="line">        costs.append(avg_cost)</span><br><span class="line">    print(sess.run(accuracy, feed_dict=&#123;x: mnist.test.images, y: mnist.test.labels&#125;))</span><br><span class="line">    saver.save(sess,<span class="string">'./'</span>, global_step=epochs) <span class="comment">#保存模型</span></span><br><span class="line">    sess.close()</span><br><span class="line">    costs = np.squeeze(costs)</span><br><span class="line">    plt.plot(costs)</span><br><span class="line">    plt.show()</span><br></pre></td></tr></table></figure>
+<pre><code>epoch1,cost=1.764043
+epoch2,cost=0.553732
+epoch3,cost=0.377033
+epoch4,cost=0.296909
+epoch5,cost=0.250849
+epoch6,cost=0.222690
+epoch7,cost=0.203826
+epoch8,cost=0.187270
+epoch9,cost=0.176289
+epoch10,cost=0.169246
+epoch11,cost=0.160853
+epoch12,cost=0.156802
+epoch13,cost=0.151215
+epoch14,cost=0.144273
+epoch15,cost=0.142850
+epoch16,cost=0.134713
+epoch17,cost=0.135944
+epoch18,cost=0.133344
+epoch19,cost=0.129857
+epoch20,cost=0.126890
+0.9725
+</code></pre>
+<p><img src="/images/2018/12/view.png" alt="alt"></p>
+<p>emmm, 蜜汁随缘调参职能到97.25%了</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://LTitan.github.io/2018/12/02/tensorflow/" title="TensorFlow 使用及手写字体训练" target="_blank" rel="external">https://LTitan.github.io/2018/12/02/tensorflow/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/ltitan" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/lyf.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/ltitan" target="_blank"><span class="text-dark">LTitan</span><small class="ml-1x">C++/Python &amp; Algorithm</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom="">
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2018/11/20/逆向分析/" title="个人逆向分析"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope="" itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"left","width":75,"height":100},"mobile":{"show":true},"log":false});</script></body>
+</html>

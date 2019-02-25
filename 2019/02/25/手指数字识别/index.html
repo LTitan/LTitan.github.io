@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>手指数字识别 | Hexo</title>
+  <meta name="description" content="准备工作 家里面闲置一台手机，手机的像素还算不错，于是就想利用手机的摄像功能代替摄像头，来收集拍摄些图片进行深度学习。  设备展示 这个手机被我用钉子固定在一块木板上了  通过droidcam软件，进行局域网视频传输    手指数字拍摄 捣鼓这个东西太费时间太费力了，因为一个人的工作，我一边调动作一边拍照，弄了一下午胳膊也麻了。 最后0-5个数字分别拍了60张，成果如下(之前没有截图，现在剩下我">
+<meta name="keywords" content="DeepLearning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="手指数字识别">
+<meta property="og:url" content="https://LTitan.github.io/2019/02/25/手指数字识别/index.html">
+<meta property="og:site_name" content="LTitan`s Blog">
+<meta property="og:description" content="准备工作 家里面闲置一台手机，手机的像素还算不错，于是就想利用手机的摄像功能代替摄像头，来收集拍摄些图片进行深度学习。  设备展示 这个手机被我用钉子固定在一块木板上了  通过droidcam软件，进行局域网视频传输    手指数字拍摄 捣鼓这个东西太费时间太费力了，因为一个人的工作，我一边调动作一边拍照，弄了一下午胳膊也麻了。 最后0-5个数字分别拍了60张，成果如下(之前没有截图，现在剩下我">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ltitan.github.io/images/2019/02/tools1.jpg">
+<meta property="og:image" content="https://ltitan.github.io/images/2019/02/tools2.jpg">
+<meta property="og:image" content="https://ltitan.github.io/images/2019/02/tools3.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2019/02/figure.png">
+<meta property="og:image" content="https://ltitan.github.io/images/2019/02/ConvNet.jpg">
+<meta property="og:updated_time" content="2019-02-25T12:45:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="手指数字识别">
+<meta name="twitter:description" content="准备工作 家里面闲置一台手机，手机的像素还算不错，于是就想利用手机的摄像功能代替摄像头，来收集拍摄些图片进行深度学习。  设备展示 这个手机被我用钉子固定在一块木板上了  通过droidcam软件，进行局域网视频传输    手指数字拍摄 捣鼓这个东西太费时间太费力了，因为一个人的工作，我一边调动作一边拍照，弄了一下午胳膊也麻了。 最后0-5个数字分别拍了60张，成果如下(之前没有截图，现在剩下我">
+<meta name="twitter:image" content="https://ltitan.github.io/images/2019/02/tools1.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://LTitan.github.io/2019/02/25/手指数字识别/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="LTitan`s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+  
+</head>
+
+
+<body class="main-center theme-blue" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/ltitan" target="_blank">
+          <img class="img-circle img-rotate" src="/images/lyf.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">LTitan</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">C++/Python &amp; Algorithm</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Jilin, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索">
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech="">
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope="" itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope="" itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/DeepLearning/">DeepLearning</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/">OS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data-structure</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opencv/">opencv</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/others/">others</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-手指数字识别" class="article article-type-post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      手指数字识别
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2019/02/25/手指数字识别/" class="article-date">
+	  <time datetime="2019-02-25T11:50:56.000Z" itemprop="datePublished">2019-02-25</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/DeepLearning/">DeepLearning</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2019/02/25/手指数字识别/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 1.1k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 5(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="准备工作"><a class="markdownIt-Anchor" href="#准备工作"></a> 准备工作</h1>
+<p>家里面闲置一台手机，手机的像素还算不错，于是就想利用手机的摄像功能代替摄像头，来收集拍摄些图片进行深度学习。</p>
+<h2 id="设备展示"><a class="markdownIt-Anchor" href="#设备展示"></a> 设备展示</h2>
+<p>这个手机被我用钉子固定在一块木板上了<br>
+<img src="/images/2019/02/tools1.jpg" alt=""><br>
+通过droidcam软件，进行局域网视频传输<br>
+<img src="/images/2019/02/tools2.jpg" alt=""><br>
+<img src="/images/2019/02/tools3.png" alt=""></p>
+<h1 id="手指数字拍摄"><a class="markdownIt-Anchor" href="#手指数字拍摄"></a> 手指数字拍摄</h1>
+<p>捣鼓这个东西太费时间太费力了，因为一个人的工作，我一边调动作一边拍照，弄了一下午胳膊也麻了。</p>
+<p>最后0-5个数字分别拍了60张，成果如下(之前没有截图，现在剩下我处理过的了都是100*100的照片了):<br>
+<img src="/images/2019/02/figure.png" alt=""></p>
+<h2 id="利用opencv浅层处理"><a class="markdownIt-Anchor" href="#利用opencv浅层处理"></a> 利用opencv浅层处理</h2>
+<p>拍完后的照片都是640*480格式大小的，最后用opencv简单的resize成100 * 100的了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 先用代码读取改路径下的所有照片名称</span><br><span class="line">图片 = cv::imread(路径)</span><br><span class="line">cv::resize(图片,保存的图像,cv::Size(100,100))</span><br><span class="line">cv::imwrite(路径, 保存的图像)</span><br></pre></td></tr></table></figure>
+<h1 id="模型搭建"><a class="markdownIt-Anchor" href="#模型搭建"></a> 模型搭建</h1>
+<p>此模型采用的是自己瞎想的卷积神经网络，用了VGG的思想，但是最后结果不尽心意，抽时间改善模型<br>
+<img src="/images/2019/02/ConvNet.jpg" alt=""></p>
+<h1 id="模型代码及结果"><a class="markdownIt-Anchor" href="#模型代码及结果"></a> 模型代码及结果</h1>
+<p>结果只有35%的成效，看来是模型很不行(笑哭),下次用用VGG-16试试水</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> tf_utils</span><br><span class="line"><span class="keyword">import</span> MyData</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X_train,y_train = MyData.load_datas()</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(y_train.shape)</span><br></pre></td></tr></table></figure>
+<pre><code>(360, 1)
+</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">weight</span><span class="params">(shape, stddev, name)</span>:</span></span><br><span class="line">    inital = tf.truncated_normal(shape, stddev=stddev)</span><br><span class="line">    <span class="keyword">return</span> tf.Variable(inital, name=name)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bais</span><span class="params">(length, value, name)</span>:</span></span><br><span class="line">    inital = tf.constant(value, shape=length)</span><br><span class="line">    <span class="keyword">return</span> tf.Variable(inital, name=name)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">convert_to_one_hot</span><span class="params">(Y, C)</span>:</span></span><br><span class="line">    Y = np.eye(C)[Y.reshape(<span class="number">-1</span>)]</span><br><span class="line">    <span class="keyword">return</span> Y</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">conv2d</span><span class="params">(x, W, stride, pad)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> tf.nn.conv2d(x, W, strides=stride, padding=pad)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">max_pool_2d</span><span class="params">(x, ksize, stride)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> tf.nn.max_pool(x, ksize=ksize, strides= stride, padding=<span class="string">'SAME'</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m, height, width, channels = X_train.shape</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">X = tf.placeholder(tf.float32, [<span class="keyword">None</span>, height, width, channels], name=<span class="string">'X'</span>)</span><br><span class="line">y_true = tf.placeholder(tf.float32, [<span class="keyword">None</span>, <span class="number">6</span>], name=<span class="string">'y_true'</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">conv_W_b = &#123;</span><br><span class="line">    <span class="string">'W1'</span>:weight([<span class="number">9</span>, <span class="number">9</span>, channels, <span class="number">10</span>], <span class="number">0.5</span>, <span class="string">'W1'</span>),</span><br><span class="line">    <span class="string">'b1'</span>:bais([<span class="number">10</span>], <span class="number">0.5</span>, <span class="string">'b1'</span>),</span><br><span class="line">    <span class="string">'W2'</span>:weight([<span class="number">7</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="number">16</span>], <span class="number">0.5</span>, <span class="string">'W2'</span>),</span><br><span class="line">    <span class="string">'b2'</span>:bais([<span class="number">16</span>], <span class="number">0.5</span>, <span class="string">'b2'</span>),</span><br><span class="line">    <span class="string">'W3'</span>:weight([<span class="number">7</span>, <span class="number">7</span>, <span class="number">16</span>, <span class="number">32</span>], <span class="number">0.5</span>, <span class="string">'W3'</span>),</span><br><span class="line">    <span class="string">'b3'</span>:bais([<span class="number">32</span>], <span class="number">0.5</span>, <span class="string">'b3'</span>),</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">h_conv1 = tf.nn.relu(conv2d(X, conv_W_b[<span class="string">'W1'</span>], [<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>], <span class="string">'VALID'</span>) + conv_W_b[<span class="string">'b1'</span>])</span><br><span class="line">h_pool1 = max_pool_2d(h_conv1, [<span class="number">1</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">1</span>], [<span class="number">1</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">h_conv2 = tf.nn.relu(conv2d(h_pool1, conv_W_b[<span class="string">'W2'</span>], [<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>], <span class="string">'VALID'</span>) + conv_W_b[<span class="string">'b2'</span>])</span><br><span class="line">h_pool2 = max_pool_2d(h_conv2, [<span class="number">1</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">1</span>], [<span class="number">1</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">h_conv3 = tf.nn.relu(conv2d(h_pool2, conv_W_b[<span class="string">'W3'</span>], [<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>], <span class="string">'VALID'</span>) + conv_W_b[<span class="string">'b3'</span>])</span><br><span class="line">h_pool3 = max_pool_2d(h_conv3, [<span class="number">1</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">1</span>], [<span class="number">1</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fc_W_b = &#123;</span><br><span class="line">    <span class="string">'W_fc1'</span>:weight([<span class="number">7</span>*<span class="number">7</span>*<span class="number">32</span>, <span class="number">512</span>], <span class="number">0.5</span>, <span class="string">'W_fc1'</span>),</span><br><span class="line">    <span class="string">'b_fc1'</span>:bais([<span class="number">512</span>], <span class="number">0.1</span>, <span class="string">'b_fc1'</span>),</span><br><span class="line">    <span class="string">'W_fc2'</span>:weight([<span class="number">512</span>, <span class="number">512</span>], <span class="number">0.5</span>, <span class="string">'W_fc2'</span>),</span><br><span class="line">    <span class="string">'b_fc2'</span>:bais([<span class="number">512</span>], <span class="number">0.1</span>, <span class="string">'b_fc2'</span>),</span><br><span class="line">    <span class="string">'W_fc3'</span>:weight([<span class="number">512</span>,<span class="number">64</span>], <span class="number">0.5</span>, <span class="string">'W_fc3'</span>),</span><br><span class="line">    <span class="string">'b_fc3'</span>:bais([<span class="number">64</span>], <span class="number">0.1</span>, <span class="string">'b_fc3'</span>),</span><br><span class="line">    <span class="string">'W_out'</span>:weight([<span class="number">64</span>, <span class="number">6</span>], <span class="number">0.5</span>, <span class="string">'W_out'</span>),</span><br><span class="line">    <span class="string">'b_out'</span>:bais([<span class="number">6</span>], <span class="number">0.1</span>, <span class="string">'b_out'</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">h_flat = tf.reshape(h_pool3, [<span class="number">-1</span>, <span class="number">7</span>*<span class="number">7</span>*<span class="number">32</span>])</span><br><span class="line">h_fc1 = tf.nn.relu(tf.matmul(h_flat, fc_W_b[<span class="string">'W_fc1'</span>]) + fc_W_b[<span class="string">'b_fc1'</span>])</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">keep_prob = tf.placeholder(tf.float32)</span><br><span class="line">h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, fc_W_b[<span class="string">'W_fc2'</span>]) + fc_W_b[<span class="string">'b_fc2'</span>])</span><br><span class="line">h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">h_fc3 = tf.nn.relu(tf.matmul(h_fc2_drop, fc_W_b[<span class="string">'W_fc3'</span>]) + fc_W_b[<span class="string">'b_fc3'</span>])</span><br><span class="line">h_fc3_drop = tf.nn.dropout(h_fc3, keep_prob)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">y_out = tf.nn.softmax(tf.matmul(h_fc3_drop, fc_W_b[<span class="string">'W_out'</span>]) + fc_W_b[<span class="string">'b_out'</span>], name=<span class="string">'output'</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">next_batch</span><span class="params">(train_data, train_target, batch_size)</span>:</span>  </span><br><span class="line">    index = [ i <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,len(train_target)) ]  </span><br><span class="line">    np.random.shuffle(index);  </span><br><span class="line">    batch_data = []; </span><br><span class="line">    batch_target = [];  </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,batch_size):  </span><br><span class="line">        batch_data.append(train_data[index[i]]);  </span><br><span class="line">        batch_target.append(train_target[index[i]])  </span><br><span class="line">    <span class="keyword">return</span> batch_data, batch_target</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=y_out, labels=y_true)</span><br><span class="line">cost = tf.reduce_mean(cross_entropy)</span><br><span class="line">optimizer = tf.train.AdamOptimizer(<span class="number">0.0008</span>).minimize(cost)</span><br><span class="line">correct_prediction = tf.equal(tf.argmax(y_out, <span class="number">1</span>), tf.argmax(y_true, <span class="number">1</span>))</span><br><span class="line">accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">y_train = convert_to_one_hot(y_train, <span class="number">6</span>)</span><br><span class="line"><span class="comment">#y_test = convert_to_one_hot(y_test, 6)</span></span><br><span class="line">X_train = X_train / <span class="number">255</span></span><br><span class="line"><span class="comment">#X_test = X_test / 255</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    sess.run(tf.global_variables_initializer())</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2000</span>):</span><br><span class="line">        batch_x, batch_y = next_batch(X_train, y_train, <span class="number">16</span>)</span><br><span class="line">        np.random.seed(i)</span><br><span class="line">        _, c = sess.run([optimizer, cost], feed_dict=&#123;X:batch_x, y_true:batch_y, keep_prob:<span class="number">0.5</span>&#125;)</span><br><span class="line">        <span class="keyword">if</span> (i%<span class="number">100</span> == <span class="number">0</span> <span class="keyword">or</span> i==<span class="number">1999</span>) <span class="keyword">and</span> i!=<span class="number">0</span>:</span><br><span class="line">            acc = sess.run(accuracy,feed_dict=&#123;X:batch_x, y_true:batch_y, keep_prob:<span class="number">1.0</span>&#125;)</span><br><span class="line">            print(<span class="string">'迭代%d 正确率为%f'</span> %(i+<span class="number">1</span>, acc))</span><br><span class="line">            <span class="comment"># acc = sess.run(accuracy,feed_dict=&#123;X:X_test, y_true:y_test, keep_prob:1.0&#125;)</span></span><br><span class="line">           <span class="comment"># print('测试集准确率:%f  损失率%f'%(acc, c))</span></span><br></pre></td></tr></table></figure>
+<pre><code>迭代101 正确率为0.187500
+迭代201 正确率为0.375000
+迭代301 正确率为0.187500
+迭代401 正确率为0.125000
+迭代501 正确率为0.125000
+迭代601 正确率为0.312500
+迭代701 正确率为0.312500
+迭代801 正确率为0.125000
+迭代901 正确率为0.062500
+迭代1001 正确率为0.187500
+迭代1101 正确率为0.125000
+迭代1201 正确率为0.125000
+迭代1301 正确率为0.000000
+迭代1401 正确率为0.125000
+迭代1501 正确率为0.312500
+迭代1601 正确率为0.125000
+迭代1701 正确率为0.250000
+迭代1801 正确率为0.250000
+迭代1901 正确率为0.125000
+迭代2000 正确率为0.187500
+</code></pre>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://LTitan.github.io/2019/02/25/手指数字识别/" title="手指数字识别" target="_blank" rel="external">https://LTitan.github.io/2019/02/25/手指数字识别/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/ltitan" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/lyf.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/ltitan" target="_blank"><span class="text-dark">LTitan</span><small class="ml-1x">C++/Python &amp; Algorithm</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom="">
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2018/12/02/tensorflow/" title="TensorFlow 使用及手写字体训练"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope="" itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/ltitan" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/5717259065" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"left","width":75,"height":100},"mobile":{"show":true},"log":false});</script></body>
+</html>
